@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/Users/efelix/.pyenv/shims/python3
 
 """vncpasswd.py: Python implementation of vncpasswd, w/decryption abilities & extra features ;-)"""
 
@@ -76,14 +76,14 @@ def unhex(s):
         s = s.decode('hex')
     except TypeError as e:
         if e.message == 'Odd-length string':
-            print 'WARN: %s . Chopping last char off... "%s"' % ( e.message, s[:-1] )
+            print('WARN: %s . Chopping last char off... "%s"' % ( e.message, s[:-1] ))
             s = s[:-1].decode('hex')
         else:
             raise
     return s
 
 def run_tests(verbose=False):
-    print "Running Unit Tests..."
+    print("Running Unit Tests...")
     import doctest
     import __main__
     (failure_count, test_count) = doctest.testmod(None, None, None, verbose, True)
@@ -93,12 +93,12 @@ def run_tests(verbose=False):
     ignore_methods = ['__builtins__', '__doc__', '__file__', '__name__', '__package__', '__warningregistry__', 'argparse', 'sys' ]
     methods = [i for i in methods if not i in ignore_methods or ignore_methods.remove(i)]
 
-    print '%d tests in %s items.' % ( test_count, len(methods) )
+    print('%d tests in %s items.' % ( test_count, len(methods) ))
     if failure_count > 0:
-        print '%d out of %d tests failed' % (failure_count, test_count)
+        print('%d out of %d tests failed' % (failure_count, test_count))
     else:
-        print '%d passed and %d failed.' % ( pass_count, failure_count )
-        print 'Test passed.'
+        print('%d passed and %d failed.' % ( pass_count, failure_count ))
+        print('Test passed.')
     sys.exit(failure_count)
 
 def main():
@@ -137,11 +137,12 @@ def main():
     # If the hex encoded passwd length is longer than 16 hex chars and divisible
     # by 16, then we chop the passwd into blocks of 64 bits (16 hex chars)
     # (1 hex char = 4 binary bits = 1 nibble)
-    hexpasswd = args.passwd.encode('hex')
+    #hexpasswd = args.passwd.encode('hex')
+    hexpasswd = args.passwd.encode("utf-8").hex()
     if ( len(hexpasswd) > 16 and (len(hexpasswd) % 16) == 0 ):
-        print 'INFO: Detected ciphertext > 64 bits... breaking into blocks to decrypt...'
+        print('INFO: Detected ciphertext > 64 bits... breaking into blocks to decrypt...')
         splitstr = split_len(args.passwd.encode('hex'), 16)
-        print 'INFO: Split blocks = %s' % splitstr
+        print('INFO: Split blocks = %s' % splitstr)
         cryptedblocks = []
         for sblock in splitstr:
             cryptedblocks.append( do_crypt(sblock.decode('hex'), args.decrypt) )
@@ -151,9 +152,9 @@ def main():
         crypted = do_crypt(args.passwd, args.decrypt)
     else:
         if ( args.decrypt ):
-            print 'WARN: Ciphertext length was not divisible by 8 (hex/16).'
-            print 'Length: %d' % len(args.passwd)
-            print 'Hex Length: %d' % len(hexpasswd)
+            print('WARN: Ciphertext length was not divisible by 8 (hex/16).')
+            print('Length: %d' % len(args.passwd))
+            print('Hex Length: %d' % len(hexpasswd))
         crypted = do_crypt(args.passwd, args.decrypt)
 
     if ( args.filename != None and not args.decrypt ):
@@ -167,7 +168,7 @@ def main():
     prefix = ('En','De')[args.decrypt == True]
     #print "%scrypted Bin Pass= '%s'" % ( prefix, crypted )
     #print "%scrypted Hex Pass= '%s'" % ( prefix, crypted.encode('hex') )
-    print "%s" % ( crypted.encode('hex') )
+    print("%s" % ( crypted.hex() ))
 
 
 def get_realvnc_key():
