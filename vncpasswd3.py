@@ -14,8 +14,17 @@ import argparse
 import platform
 #from struct import pack, unpack
 
-import d3des as d
-if platform.system().startswith('Windows'): import WindowsRegistry as wreg 
+from d3des import d3des as d
+if platform.system().startswith('Windows'): from WindowsRegistry import WindowsRegistry as wreg
+
+DEBUG = False
+
+def eprint(*args, **kwargs):
+    if DEBUG:
+        _file = sys.stdout
+    else:
+        _file = sys.stderr
+    print(*args, file=_file, **kwargs)
 
 def split_len(seq, length):
     return [seq[i:i+length] for i in range(0, len(seq), length)]
@@ -76,13 +85,15 @@ def unhex(s):
         s = s.decode('hex')
     except TypeError as e:
         if e.message == 'Odd-length string':
-            print('WARN: %s . Chopping last char off... "%s"' % ( e.message, s[:-1] ))
+            perint('WARN: %s . Chopping last char off... "%s"' % ( e.message, s[:-1] ))
             s = s[:-1].decode('hex')
         else:
             raise
     return s
 
 def run_tests(verbose=False):
+    global DEBUG
+    DEBUG = True
     print("Running Unit Tests...")
     import doctest
     import __main__
@@ -111,6 +122,8 @@ def main():
             help="Assume input is in hex.")
     parser.add_argument("-R", "--registry", dest="registry", action="store_true", default=False, \
             help="Input or Output to the windows registry.")
+    parser.add_argument("-o", "--stdout", dest="stdout", action="store_true", default=False, \
+            help="Input or Output only the resulting value to STDOUT. Always output ciphertext in hexidecimal, and plaintext in ASCII / UTF-8. A newline is appended to the value. Useful for scripting.")
     parser.add_argument("-f", "--file", dest="filename", \
             help="Input or Output to a specified file.")
     parser.add_argument("passwd", nargs='?', \
